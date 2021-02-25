@@ -88,7 +88,7 @@ function CardInfo() {
         return;
       }
       if (e.nativeEvent.data === null) {
-        if(name !== null){
+        if (name !== null) {
           setName(name.substring(0, name.length - 1));
         }
       } else {
@@ -98,10 +98,16 @@ function CardInfo() {
   }
 
   const handleCardCVCChange = (e) => {
-    if (e.nativeEvent.data === null) {
-      setCvc(cvc.substring(0, cvc.length - 1));
-    } else {
+
+    if (e.nativeEvent.data !== null && e.nativeEvent.data.match(/[a-z]/i)) {
       setCvc(cvc.concat(e.nativeEvent.data));
+      return setValidCVC(false);
+    } else {
+      if (e.nativeEvent.data === null) {
+        setCvc(cvc.substring(0, cvc.length - 1));
+      } else {
+        setCvc(cvc.concat(e.nativeEvent.data));
+      }
     }
   }
 
@@ -120,7 +126,7 @@ function CardInfo() {
   }
 
   const validateCVC = (cvc) => {
-    if (cvc.length === 3) {
+    if (cvc.length === 3 && !isNaN(cvc)) {
       return true;
     }
     else {
@@ -131,7 +137,7 @@ function CardInfo() {
   const validateExpiry = (expiryD) => {
     var result = false;
 
-    if (expiryD.length === 4) {
+    if (expiryD.length === 4 && !isNaN(expiryD)) {
       var ExpiryMonth = expiryD.substring(2, 0);
       var ExpiryYear = expiryD.substring(expiryD.length - 2, expiryD.length);
       var today = new Date();
