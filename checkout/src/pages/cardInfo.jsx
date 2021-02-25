@@ -77,6 +77,10 @@ function CardInfo() {
   }
 
   const handleNameChange = (e) => {
+    if (e.nativeEvent.data === undefined) {
+      setName(" ");
+      return;
+    }
     if (e.nativeEvent.data === null) {
       setName(name.substring(0, name.length - 1));
     } else {
