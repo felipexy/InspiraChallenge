@@ -13,6 +13,7 @@ ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
       <Router>
+        <Route path="/" component={Options} />
         <Route path="/options" component={Options} />
         <Route path="/cardInfo" component={CardInfo} />
         <Route path="/summary" component={Summary} />
