@@ -123,7 +123,6 @@ function CardInfo() {
   }
 
   const validateName = (name) => {
-    debugger
     if (isNaN(name)) {
       return true;
     } else {
