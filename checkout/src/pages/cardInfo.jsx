@@ -1,18 +1,39 @@
-import '../App.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
-import { FlexContainer, CentralizeHorizontal, WhiteBox, BackgroundColor, DarkUpperDetail, FlexContainerRow, Title } from '../utils/Layout'
+import { FlexContainer, CentralizeHorizontal, WhiteBox, BackgroundColor, DarkUpperDetail, FlexContainerRow, Title, PackagePrice } from '../utils/Layout'
 import { useSelector, useDispatch } from 'react-redux';
-import { Button, Input } from 'semantic-ui-react'
+import { Button } from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css'
 import Cards from 'react-credit-cards';
 import { Icon } from 'semantic-ui-react'
 import 'react-credit-cards/es/styles-compiled.css'
-import currentDate from '../utils/Date'
+import TextField from '@material-ui/core/TextField';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    '& .MuiTextField-root': {
+      margin: theme.spacing(0.7),
+      width: 290
+    },
+  },
+  expiryCvc: {
+    '& .MuiTextField-root': {
+      margin: theme.spacing(0.5),
+      width: 150,
+    },
+  },
+  cvc: {
+    '& .MuiTextField-root': {
+      margin: theme.spacing(0.5),
+      width: 131
+    },
+  },
+}));
 
 function CardInfo() {
 
-
+  const classes = useStyles();
   const history = useHistory();
   const purchInfo = useSelector((state) => state.slider);
 
@@ -22,6 +43,22 @@ function CardInfo() {
   const [name, setName] = useState('');
   const [focus, setFocus] = useState('');
   const dispatch = useDispatch();
+  const [validNumber, setValidNumber] = useState(Boolean);
+  const [validExpiry, setValidExpiry] = useState(Boolean);
+  const [validCVC, setValidCVC] = useState(Boolean);
+
+  const validateCardNumber = useCallback((number) => {
+    var regex = new RegExp("^[0-9]{16}$");
+    if (!regex.test(number))
+      return false;
+    return luhnCheck(number);
+  }, []);
+
+  useEffect(() => {
+    setValidNumber(validateCardNumber(cardNumber));
+    setValidExpiry(validateExpiry(expiry));
+    setValidCVC(validateCVC(cvc));
+  }, [validateCardNumber, cardNumber, expiry, cvc]);
 
   const handleCardNumber = (e) => {
     if (e.nativeEvent.data === null) {
@@ -56,17 +93,70 @@ function CardInfo() {
   }
 
   const handleInputFocus = (e) => {
-    setFocus(e.target.name);
+    setFocus(e.target.id);
   }
 
   const handleButtonClick = () => {
-    var dateSummary = (new Date()).toString().split(' ').splice(1,3).join(' ');
+    var dateSummary = (new Date()).toString().split(' ').splice(1, 3).join(' ');
     dispatch({ type: 'ADD_TO_SUMMARY', summary: { package: purchInfo.package, price: purchInfo.price, date: dateSummary } });
     history.push('/summary');
   }
 
   if (purchInfo.price === 0 || purchInfo.package === 0) {
     history.push('/options');
+  }
+
+  const validateCVC = (cvc) => {
+    if (cvc.length === 3) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  const validateExpiry = (expiryD) => {
+    var result = false;
+
+    if (expiryD.length === 4) {
+      var ExpiryMonth = expiryD.substring(2, 0);
+      var ExpiryYear = expiryD.substring(expiryD.length - 2, expiryD.length);
+      var today = new Date();
+      var month = `${today.getUTCMonth() + 1}`;
+      const year = `${today.getUTCFullYear()}`;
+      let yearFormat = year.substring(year.length - 2, year.length);
+
+      if (ExpiryYear >= yearFormat) {
+        if (ExpiryYear === yearFormat) {
+          if (parseInt(ExpiryMonth) >= parseInt(month)) {
+            result = true;
+          } else {
+            result = false;
+          }
+        } else {
+          result = true;
+        }
+      }
+    } else {
+      result = false;
+    }
+    return result;
+  }
+
+
+  const luhnCheck = (val) => {
+    var sum = 0;
+    for (var i = 0; i < val.length; i++) {
+      var intVal = parseInt(val.substr(i, 1));
+      if (i % 2 === 0) {
+        intVal *= 2;
+        if (intVal > 9) {
+          intVal = 1 + (intVal % 10);
+        }
+      }
+      sum += intVal;
+    }
+    return (sum % 10) === 0;
   }
 
   return (
@@ -84,41 +174,79 @@ function CardInfo() {
               focused={focus}
               name={name}
               number={cardNumber}
+              placeholders={{ name: 'SEU NOME AQUI' }}
             />
             <br />
             <FlexContainer>
-              <Input
-                type="tel"
-                name="number"
-                placeholder="Número do Cartão"
-                onChange={event => handleCardNumber(event)}
-                onFocus={event => handleInputFocus(event)}
-              />
-              <Input
-                type="tel"
-                name="name"
-                placeholder="Nome no Cartão"
-                onChange={event => handleNameChange(event)}
-                onFocus={event => handleInputFocus(event)}
-              />
-              <Input
-                type="tel"
-                name="expiry"
-                placeholder="Mês de validade"
-                onChange={event => handleCardExpiryChange(event)}
-                onFocus={event => handleInputFocus(event)}
-              />
-              <Input
-                type="tel"
-                name="cvc"
-                placeholder="CVC"
-                onChange={event => handleCardCVCChange(event)}
-                onFocus={event => handleInputFocus(event)}
-              />
+              <form className={classes.root}>
+                {(validNumber === false && cardNumber !== '') ? <TextField error
+                  id="number"
+                  helperText="Número incorreto"
+                  label="Número do Cartão"
+                  variant="outlined"
+                  onChange={event => handleCardNumber(event)}
+                  onFocus={event => handleInputFocus(event)}
+                /> : <TextField
+                    id="number"
+                    label="Número do Cartão"
+                    variant="outlined"
+                    onChange={event => handleCardNumber(event)}
+                    onFocus={event => handleInputFocus(event)}
+                  />}
+              </form>
+              <form className={classes.root}>
+                <TextField
+                  id="name"
+                  label="Nome no Cartão"
+                  variant="outlined"
+                  onChange={event => handleNameChange(event)}
+                  onFocus={event => handleInputFocus(event)}
+                />
+              </form>
+              <form className={classes.expiryCvc}>
+                <FlexContainerRow>
+                  <div className={classes.expiry}>
+                    {(validExpiry === false && expiry !== '') ? <TextField error
+                      id="expiry"
+                      helperText="Data incorreta"
+                      label="Mês de validade"
+                      variant="outlined"
+                      onChange={event => handleCardExpiryChange(event)}
+                      onFocus={event => handleInputFocus(event)}
+                    /> : <TextField
+                        id="expiry"
+                        label="Mês de validade"
+                        variant="outlined"
+                        onChange={event => handleCardExpiryChange(event)}
+                        onFocus={event => handleInputFocus(event)}
+                      />
+                    }
+                  </div>
+                  <div className={classes.cvc}>
+                    {(validCVC === false && cvc !== '') ? <TextField error
+                      id="cvc"
+                      label="CVC"
+                      helperText="Dado incorreto"
+                      variant="outlined"
+                      onFocus={event => handleInputFocus(event)}
+                      onChange={event => handleCardCVCChange(event)}
+                    /> : <TextField
+                        id="cvc"
+                        label="CVC"
+                        helperText="Ex.: 131"
+                        variant="outlined"
+                        onFocus={event => handleInputFocus(event)}
+                        onChange={event => handleCardCVCChange(event)}
+                      />}
+                  </div>
+                </FlexContainerRow>
+              </form>
+
             </FlexContainer>
-            <br />
-            <h1>{purchInfo.package} pontos por R$ {purchInfo.price}</h1>
-            {(cardNumber != '' && name != '' && expiry != '' && cvc != '' && purchInfo.package != 0 && purchInfo.price != 0) ? <Button color='blue' size='huge' circular='true' onClick={() => handleButtonClick()}>
+
+            <PackagePrice>{purchInfo.package} pontos por R$ {purchInfo.price}</PackagePrice>
+
+            {(cardNumber !== '' && name !== '' && expiry !== '' && cvc !== '' && purchInfo.package !== 0 && purchInfo.price !== 0 && validNumber === true && validExpiry === true && validCVC === true) ? <Button color='blue' size='huge' circular='true' onClick={() => handleButtonClick()}>
               Pagar
               </Button> : <Button disabled="true" size='huge' circular='true'>Pagar</Button>
             }

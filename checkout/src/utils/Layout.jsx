@@ -43,10 +43,13 @@ export const DarkUpperDetail = styled.div`
 
 export const Title = styled.h2`
   padding-top: -7vh;
-  margin-left: -5%;
+  margin-left: -2%;
   padding-bottom: 5%;
 `;
 
+export const PackagePrice = styled.h2`
+  margin-top: 0.5vh;
+`;
 
 export const FlexContainer = styled.div`
     display: flex;
@@ -63,7 +66,8 @@ export const CentralizeHorizontal = styled.div`
     margin-right: auto;
 `;
 
-export const CentralizeComboBox = styled.div`
+export const CentralizeSlider= styled.div`
     margin-left: 3vh;
+    margin-top: 9%;
 `;
 
