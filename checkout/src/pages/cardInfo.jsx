@@ -77,6 +77,7 @@ function CardInfo() {
   }
 
   const handleNameChange = (e) => {
+    e.preventDefault();
     if (e.nativeEvent.data === undefined) {
       setName(" ");
       return;
