@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
     '& .MuiTextField-root': {
       margin: theme.spacing(0.5),
       width: 150,
+      left: 2
     },
   },
   cvc: {
@@ -78,14 +79,21 @@ function CardInfo() {
 
   const handleNameChange = (e) => {
     e.preventDefault();
-    if (e.nativeEvent.data === undefined) {
-      setName(" ");
-      return;
-    }
-    if (e.nativeEvent.data === null) {
-      setName(name.substring(0, name.length - 1));
+
+    if (e.nativeEvent.data !== null && !e.nativeEvent.data.match(/[a-z]/i)) {
+      return false;
     } else {
-      setName(name.concat(e.nativeEvent.data));
+      if (e.nativeEvent.data === undefined) {
+        setName(" ");
+        return;
+      }
+      if (e.nativeEvent.data === null) {
+        if(name !== null){
+          setName(name.substring(0, name.length - 1));
+        }
+      } else {
+        setName(name.concat(e.nativeEvent.data));
+      }
     }
   }
 
