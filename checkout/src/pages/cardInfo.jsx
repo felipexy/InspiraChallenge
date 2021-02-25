@@ -47,6 +47,7 @@ function CardInfo() {
   const [validNumber, setValidNumber] = useState(Boolean);
   const [validExpiry, setValidExpiry] = useState(Boolean);
   const [validCVC, setValidCVC] = useState(Boolean);
+  const [validName, setValidName] = useState(Boolean);
 
   const validateCardNumber = useCallback((number) => {
     var regex = new RegExp("^[0-9]{16}$");
@@ -59,7 +60,8 @@ function CardInfo() {
     setValidNumber(validateCardNumber(cardNumber));
     setValidExpiry(validateExpiry(expiry));
     setValidCVC(validateCVC(cvc));
-  }, [validateCardNumber, cardNumber, expiry, cvc]);
+    setValidName(validateName(name));
+  }, [validateCardNumber, cardNumber, expiry, cvc, name]);
 
   const handleCardNumber = (e) => {
     if (e.nativeEvent.data === null) {
@@ -79,10 +81,6 @@ function CardInfo() {
 
   const handleNameChange = (e) => {
     e.preventDefault();
-
-    if (e.nativeEvent.data !== null && !e.nativeEvent.data.match(/[a-z]/i)) {
-      return false;
-    } else {
       if (e.nativeEvent.data === undefined) {
         setName(" ");
         return;
@@ -95,11 +93,10 @@ function CardInfo() {
         setName(name.concat(e.nativeEvent.data));
       }
     }
-  }
+  
 
   const handleCardCVCChange = (e) => {
-
-    if (e.nativeEvent.data !== null && e.nativeEvent.data.match(/[a-z]/i)) {
+    if (e.nativeEvent.data !== null) {
       setCvc(cvc.concat(e.nativeEvent.data));
       return setValidCVC(false);
     } else {
@@ -123,6 +120,15 @@ function CardInfo() {
 
   if (purchInfo.price === 0 || purchInfo.package === 0) {
     history.push('/options');
+  }
+
+  const validateName = (name) => {
+    debugger
+    if (isNaN(name)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   const validateCVC = (cvc) => {
@@ -200,6 +206,7 @@ function CardInfo() {
               <form className={classes.root}>
                 {(validNumber === false && cardNumber !== '') ? <TextField error
                   id="number"
+                  type="number"
                   helperText="Número incorreto"
                   label="Número do Cartão"
                   variant="outlined"
@@ -207,6 +214,7 @@ function CardInfo() {
                   onFocus={event => handleInputFocus(event)}
                 /> : <TextField
                     id="number"
+                    type="number"
                     label="Número do Cartão"
                     variant="outlined"
                     onChange={event => handleCardNumber(event)}
@@ -214,13 +222,21 @@ function CardInfo() {
                   />}
               </form>
               <form className={classes.root}>
-                <TextField
+                {(validName === false && name !== '') ? <TextField error
+                  type="text"
                   id="name"
                   label="Nome no Cartão"
                   variant="outlined"
                   onChange={event => handleNameChange(event)}
                   onFocus={event => handleInputFocus(event)}
-                />
+                /> : <TextField
+                    type="text"
+                    id="name"
+                    label="Nome no Cartão"
+                    variant="outlined"
+                    onChange={event => handleNameChange(event)}
+                    onFocus={event => handleInputFocus(event)}
+                  />}
               </form>
               <form className={classes.expiryCvc}>
                 <FlexContainerRow>
@@ -228,12 +244,14 @@ function CardInfo() {
                     {(validExpiry === false && expiry !== '') ? <TextField error
                       id="expiry"
                       helperText="Data incorreta"
+                      type="number"
                       label="Mês de validade"
                       variant="outlined"
                       onChange={event => handleCardExpiryChange(event)}
                       onFocus={event => handleInputFocus(event)}
                     /> : <TextField
                         id="expiry"
+                        type="number"
                         label="Mês de validade"
                         variant="outlined"
                         onChange={event => handleCardExpiryChange(event)}
@@ -245,6 +263,7 @@ function CardInfo() {
                     {(validCVC === false && cvc !== '') ? <TextField error
                       id="cvc"
                       label="CVC"
+                      type="number"
                       helperText="Dado incorreto"
                       variant="outlined"
                       onFocus={event => handleInputFocus(event)}
@@ -252,6 +271,7 @@ function CardInfo() {
                     /> : <TextField
                         id="cvc"
                         label="CVC"
+                        type="number"
                         helperText="Ex.: 131"
                         variant="outlined"
                         onFocus={event => handleInputFocus(event)}
