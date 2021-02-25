@@ -206,7 +206,6 @@ function CardInfo() {
               <form className={classes.root}>
                 {(validNumber === false && cardNumber !== '') ? <TextField error
                   id="number"
-                  type="number"
                   helperText="Número incorreto"
                   label="Número do Cartão"
                   variant="outlined"
@@ -214,7 +213,6 @@ function CardInfo() {
                   onFocus={event => handleInputFocus(event)}
                 /> : <TextField
                     id="number"
-                    type="number"
                     label="Número do Cartão"
                     variant="outlined"
                     onChange={event => handleCardNumber(event)}
@@ -244,14 +242,12 @@ function CardInfo() {
                     {(validExpiry === false && expiry !== '') ? <TextField error
                       id="expiry"
                       helperText="Data incorreta"
-                      type="number"
                       label="Mês de validade"
                       variant="outlined"
                       onChange={event => handleCardExpiryChange(event)}
                       onFocus={event => handleInputFocus(event)}
                     /> : <TextField
                         id="expiry"
-                        type="number"
                         label="Mês de validade"
                         variant="outlined"
                         onChange={event => handleCardExpiryChange(event)}
@@ -263,7 +259,6 @@ function CardInfo() {
                     {(validCVC === false && cvc !== '') ? <TextField error
                       id="cvc"
                       label="CVC"
-                      type="number"
                       helperText="Dado incorreto"
                       variant="outlined"
                       onFocus={event => handleInputFocus(event)}
@@ -271,7 +266,6 @@ function CardInfo() {
                     /> : <TextField
                         id="cvc"
                         label="CVC"
-                        type="number"
                         helperText="Ex.: 131"
                         variant="outlined"
                         onFocus={event => handleInputFocus(event)}
