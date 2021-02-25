@@ -1,5 +1,6 @@
 import { createStore } from 'redux';
 import { combineReducers } from 'redux';
+import formatValues from '../utils/formatBRL'
 
 const INITIAL_STATE_PACKAGE = {
   quantity: 0,
@@ -31,7 +32,9 @@ const priceCalculator = (pack) => {
     price = (0, 25 * pack);
   }
 
-  return price / 100;
+  const result = formatValues(price/100);
+
+  return result;
 }
 
 function SliderReducer(state = INITIAL_STATE, action) {
